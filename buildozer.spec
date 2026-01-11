@@ -1,10 +1,10 @@
 [app]
 
 # App name
-title = Screenshot App
+title = Front Camera Capture
 
 # Package name
-package.name = screenshotapp
+package.name = frontcamera
 
 # Package domain
 package.domain = org.example
@@ -22,7 +22,7 @@ version = 0.1
 requirements = python3,kivy==2.2.1,pyjnius,android
 
 # Android permissions (Android 14 specific)
-android.permissions = android.permission.READ_MEDIA_IMAGES,android.permission.FOREGROUND_SERVICE,android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION
+android.permissions = android.permission.CAMERA,android.permission.READ_MEDIA_IMAGES,android.permission.FOREGROUND_SERVICE,android.permission.FOREGROUND_SERVICE_CAMERA,android.permission.SYSTEM_ALERT_WINDOW
 
 # Orientation
 orientation = portrait
@@ -39,16 +39,13 @@ android.archs = arm64-v8a,armeabi-v7a
 fullscreen = 0
 
 # Android features
-android.features = android.hardware.screen.portrait
+android.features = android.hardware.camera,android.hardware.camera.front
 
-# Gradle dependencies for MediaProjection
+# Gradle dependencies
 android.gradle_dependencies = androidx.core:core:1.12.0
 
 # Enable androidx
 android.enable_androidx = True
-
-# Android services (required for foreground service)
-services = ScreenshotService:./service.py
 
 # Presplash settings (optional)
 #presplash.filename = %(source.dir)s/presplash.png
