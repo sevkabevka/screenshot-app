@@ -18,26 +18,56 @@ jobs:
       with:
         python-version: '3.10'
     
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y openjdk-17-jdk zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev git
-        pip install buildozer cython==0.29.33
+        sudo apt-get install -y \
+          openjdk-17-jdk \
+          zip unzip \
+          autoconf libtool \
+          pkg-config \
+          zlib1g-dev \
+          libncurses5-dev \
+          libncursesw5-dev \
+          cmake \
+          libffi-dev \
+          libssl-dev \
+          git \
+          ccache
+    
+    - name: Install Python dependencies
+      run: |
+        pip install --upgrade pip
+        pip install buildozer==1.5.0 cython==0.29.33
+    
+    - name: Cache Buildozer global directory
+      uses: actions/cache@v3
+      with:
+        path: ~/.buildozer
+        key: buildozer-${{ hashFiles('buildozer.spec') }}
     
     - name: Accept Android SDK licenses
       run: |
-        yes | buildozer android debug || true
         mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
         echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
         echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
     
-    - name: Build APK with Buildozer
+    - name: Build APK with verbose logging
       run: |
-        buildozer android debug
+        buildozer -v android debug
+      env:
+        BUILDOZER_WARN_ON_ROOT: 0
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
+      if: success()
       with:
         name: screenshot-app-apk
         path: bin/*.apk
+    
+    - name: Upload buildozer log on failure
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: buildozer-log
+        path: .buildozer/android/platform/build-*/build.log
